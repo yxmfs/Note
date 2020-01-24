@@ -1,0 +1,2 @@
+# Note
+Daily code note
