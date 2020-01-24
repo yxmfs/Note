@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>snake</title>
+</head>
+<body>
+    <canvas width="800" height="800" id="game"></canvas>
+    <script>
+        const canvas = document.querySelector("#game");
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "red";
+        ctx.fillRect(100,150,32,32);
+        let snake ={
+            x:130,
+            y:150,
+            w:32,
+            h:32
+        };
+        const snakeBody = [];
+        for(let i=0;i<5;i++){
+            snake.x = snake.x + snake.w;
+            snakeBody.unshift({...snake});
+        }
+        snakeBody.forEach((item)=>{
+            ctx.fillRect(item.x,item.y,item.w-1,item.h);
+        })
+        document.addEventListener("keydown",(e)=>{
+            switch(e.which){
+                case 37:
+                    snake.x = snake.x - snake.w;
+                break;
+                case 38:
+                    snake.y = snake.y - snake.h;
+                break;
+                case 39:
+                    snake.x = snake.x + snake.w;
+                break;
+                case 40:
+                    snake.y = snake.y + snake.h;
+                break;
+            }
+            ctx.clearRect(0,0,800,800);
+            snakeBody.unshift({...snake});
+            snakeBody.pop();
+            snakeBody.forEach((item)=>{
+                ctx.fillRect(item.x,item.y,item.w-1,item.h-1);
+            })
+        })
+    </script>
+</body>
+</html>
