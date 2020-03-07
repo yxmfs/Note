@@ -6,7 +6,16 @@
 </head>
 <body>
     <canvas width="800" height="600" id="game" style="border:1px solid"></canvas>
+    <br>
+    <br>
+    <button onclick="start(event)">点我开始游戏</button>
     <script>
+        var start = function(e){
+            if(!e){
+                var e = window.event;
+            }
+            e.target.innerHTML = e.target.innerHTML=='点我结束游戏'?'点我开始游戏':'点我结束游戏';
+        }
         const canvas = document.querySelector("#game");
         const ctx = canvas.getContext("2d");
         let snake ={
