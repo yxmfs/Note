@@ -2,50 +2,120 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>snake</title>
+    <title>贪吃蛇</title>
 </head>
 <body>
-    <canvas width="800" height="800" id="game"></canvas>
+    <canvas width="800" height="600" id="game" style="border:1px solid"></canvas>
     <script>
         const canvas = document.querySelector("#game");
         const ctx = canvas.getContext("2d");
-        ctx.fillStyle = "red";
-        ctx.fillRect(100,150,32,32);
         let snake ={
-            x:130,
-            y:150,
-            w:32,
-            h:32
+            x:0,
+            y:0,
+            w:16,
+            h:16,
+            lastDir:0,
+            offsetX:0,
+            offsetY:16,
+            color:'red'
+        };
+        const food = {
+            x:0,
+            y:0,
+            w:16,
+            h:16,
+            color:'blue'
         };
         const snakeBody = [];
         for(let i=0;i<5;i++){
             snake.x = snake.x + snake.w;
             snakeBody.unshift({...snake});
         }
+        ctx.fillStyle = snake.color;
         snakeBody.forEach((item)=>{
             ctx.fillRect(item.x,item.y,item.w-1,item.h);
         })
-        document.addEventListener("keydown",(e)=>{
-            switch(e.which){
-                case 37:
-                    snake.x = snake.x - snake.w;
-                break;
-                case 38:
-                    snake.y = snake.y - snake.h;
-                break;
-                case 39:
-                    snake.x = snake.x + snake.w;
-                break;
-                case 40:
-                    snake.y = snake.y + snake.h;
-                break;
+        const getRandom = (min,max)=>{
+            return Math.floor(Math.random() * (max-min)) + min;
+        }
+        const getRandomFood = ()=>{
+            const x = getRandom(0,25) * food.w;
+            const y = getRandom(0,25) * food.h;
+            if(snakeBody.findIndex(item=>item.x===x && item.y===y)!=-1){
+                return getRandomFood();
             }
-            ctx.clearRect(0,0,800,800);
+            return {x,y};
+        }
+        const {x,y} = getRandomFood();
+        food.x = x;
+        food.y = y;
+        ctx.fillStyle = food.color;
+        ctx.fillRect(food.x,food.y,food.w,food.h);
+        const gameOver = () => {
+            ctx.font = "30px arial";
+            ctx.textAlign = 'center';
+            ctx.fillText('Game Over!!!',canvas.width/2,canvas.height/2);
+            window.cancelAnimationFrame(runid);
+        }
+        var speed = 0;
+        const snakeMove = () => {
+            runid = window.requestAnimationFrame(snakeMove);
+            //console.log('running');
+            if(++speed<50)
+                return;
+            speed = 0;
+            snake.x = snake.x + snake.offsetX;
+            snake.y = snake.y + snake.offsetY;
+            if(snake.x<0 || snake.x>=canvas.width){
+                gameOver();
+                return;
+            }
+            if(snake.y<0 || snake.y>=canvas.height){
+                gameOver();
+                return;
+            }
+            ctx.clearRect(0,0,canvas.width,canvas.height);
             snakeBody.unshift({...snake});
-            snakeBody.pop();
+            if (food.x === snake.x && food.y === snake.y){
+                const {x,y} = getRandomFood();
+                food.x = x;
+                food.y = y;
+            }else{
+                snakeBody.pop();
+            }
+            ctx.fillStyle = snake.color;
             snakeBody.forEach((item)=>{
                 ctx.fillRect(item.x,item.y,item.w-1,item.h-1);
             })
+            ctx.fillStyle = food.color;
+            ctx.fillRect(food.x,food.y,food.w,food.h);
+        }
+        var runid = window.requestAnimationFrame(snakeMove);
+
+        document.addEventListener("keydown",(e)=>{
+            console.log(runid);
+            if(Math.abs(e.which - snake.lastDir) === 2){
+                return;
+            }
+            snake.lastDir = e.which;
+            switch(e.which){
+                case 37:
+                    snake.offsetX = -1 * snake.w;
+                    snake.offsetY = 0;
+                break;
+                case 38:
+                    snake.offsetX = 0;
+                    snake.offsetY = -1 * snake.h;
+                break;
+                case 39:
+                    snake.offsetX = snake.w;
+                    snake.offsetY = 0;
+                break;
+                case 40:
+                    snake.offsetX = 0;
+                    snake.offsetY =  snake.h;
+                break;
+            }
         })
     </script>
 </body>
